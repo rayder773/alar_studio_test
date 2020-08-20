@@ -6,25 +6,29 @@ const webpack = require('webpack');
 module.exports = {
   mode: 'development',
   entry: {
-    index: './src/js/index.js'
+    first: './src/js/first.js',
+    second: './src/js/second.js',
   },
   devtool: 'inline-source-map',
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      title: 'Main html',
+      title: 'second page',
+      template: "./src/second.html",
+      filename: "second.html",
+      chunks: ['second']
+    }),
+    new HtmlWebpackPlugin({
+      title: 'first page',
+      template: "./src/first.html",
+      filename: "first.html",
+      chunks: ['first']
+    }),
+    new HtmlWebpackPlugin({
+      title: 'index page',
       template: "./src/index.html",
-      filename: "index.html"
-    }),
-    new HtmlWebpackPlugin({
-      title: 'about html',
-      template: "./src/views/edit.html",
-      filename: "views/edit.html"
-    }),
-    new HtmlWebpackPlugin({
-      title: 'about html',
-      template: "./src/views/main.html",
-      filename: "views/main.html"
+      filename: "index.html",
+      chunks: []
     }),
   ],
   output: {
@@ -32,15 +36,17 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
   },
   devServer: {
-    contentBase: './dist',
+    // contentBase: './dist/first.html',
+    port: 3000
   },
   module: {
     rules: [
       {
-        test: /\.css/,
+        test: /\.s[ac]ss$/i,
         use: [
           'style-loader',
           'css-loader',
+          'sass-loader',
         ],
       },
     ],
