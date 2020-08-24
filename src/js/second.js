@@ -17,40 +17,32 @@ const state = {
   phone: '',
 };
 
-const createButton = (text, event) => {
-  const element = document.createElement('button');
-  element.textContent = text;
-  element.onclick = event;
+const createButton = (text, event, additionalClass = '') => {
+  const button = document.createElement('button');
+  button.classList = `customButton ${additionalClass}`;
+  button.textContent = text;
+  button.onclick = event;
 
-  return element;
+  return button;
 };
 
-function validate(value, field) {
-  let isValidName = false;
-  let isValidPhone = false;
+function validatePhone(value = '') {
+  return /^\+?\d+$/g.test(value || $phoneInput.value);
+}
 
-  switch(field) {
-    case 'phone':
-      isValidPhone = /^\+?\d+$/g.test($phoneInput.value);
-      break;
-    case 'name':
-      isValidName = !!value.length;
-      break;
-  }
-
-  console.log(isValidName, isValidPhone)
-
-  return isValidName || isValidPhone;
+function validateName() {
+  return !!$nameInput.value.length;
 }
 
 const handleChange = (e) => {
-  const { name, value } = e.target;
+  const {name, value} = e.target;
 
   state[name] = value;
 
-  const isValid = validate(value, name);
+  const isValidPhone = validatePhone();
+  const isValidName = validateName();
 
-  $addBtn.disabled = !isValid
+  $addBtn.disabled = !isValidPhone || !isValidName;
 }
 
 const handleAddUser = (e) => {
@@ -59,7 +51,7 @@ const handleAddUser = (e) => {
   const nameValue = $nameInput.value;
   const phoneValue = $phoneInput.value;
 
-  if(!nameValue || !phoneValue) {
+  if (!nameValue || !phoneValue) {
     return;
   }
 
@@ -76,22 +68,56 @@ const handleAddUser = (e) => {
   $phoneInput.value = '';
 }
 
-const handleEdit = (e) => {
-  const tr = e.path.find(el => el.localName === 'tr') || {};
+const handleSave = (e) => {
+  const { target } = e;
+  if(target.textContent !== 'save') {
 
-  if(!tr) return;
+  }
+}
+
+const handleContentEditable = e => {
+  const { target } = e;
+  const text = target.textContent;
+
+  const role = target.getAttribute('role');
+
+  if(role === 'phone') {
+    const isValid = validatePhone(text);
+  }
+
+  const user = state.users.find(u => text.startsWith(u[role]));
+  const userIndex = state.users.findIndex(u => text.startsWith(u[role]))
+
+  user[role] = text;
+
+  state.users.splice(userIndex, 1, user);
+}
+
+const handleEdit = (e) => {
+  const {target, path} = e;
+  const tr = path.find(el => el.localName === 'tr') || {};
+
+  if (!tr) return;
 
   const children = tr.children;
 
   Array.from(children).forEach(child => {
-    if(child.getAttribute('editable')) {
+    if (child.getAttribute('editable')) {
       child.contentEditable = !state.isEditable;
+      child.onkeyup = handleContentEditable;
     }
   });
 
-  state.isEditable = true;
+  state.isEditable = !state.isEditable;
 
-  e.target.textContent = state.isEditable ? 'save' : 'edit';
+  if (state.isEditable) {
+    target.textContent = 'save';
+    target.classList.add('bg-green');
+    target.addEventListener('click', handleSave);
+  } else {
+    target.textContent = 'edit';
+    target.classList.remove('bg-green');
+  }
 }
 
 const handleDelete = (e) => {
@@ -99,26 +125,30 @@ const handleDelete = (e) => {
   $tbody.removeChild(tr)
 }
 
-function drawRows (userArray = state.users) {
-  if($tbody.children) {
+function drawRows(userArray = state.users) {
+  if ($tbody.children) {
     $tbody.innerHTML = '';
   }
 
   userArray.forEach(user => {
     const tr = document.createElement('tr');
     const editButton = createButton('edit', handleEdit);
-    const deleteButton = createButton('delete', handleDelete);
+    const deleteButton = createButton('delete', handleDelete, 'bg-red');
 
-    Object.keys(user).forEach((field, i)=> {
+    Object.keys(user).forEach((field, i) => {
       const td = document.createElement('td');
       td.textContent = user[field];
-      td.setAttribute('editable', 'true')
+      td.setAttribute('editable', 'true');
+      td.setAttribute('role', field);
       tr.append(td);
     });
 
     const td = document.createElement('td');
-    td.append(editButton);
-    td.append(deleteButton);
+    const div = document.createElement('div');
+    td.append(div);
+    div.classList = 'buttonsContainer';
+    div.append(editButton);
+    div.append(deleteButton);
 
     tr.append(td);
 
@@ -130,6 +160,5 @@ drawRows();
 
 $addBtn.onclick = handleAddUser;
 $addBtn.disabled = !state.name || !state.phone;
-
 $nameInput.onkeyup = handleChange;
 $phoneInput.onkeyup = handleChange;

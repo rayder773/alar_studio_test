@@ -2,6 +2,18 @@ body {
   font-family: AnjaliOldLipi;
 }
 
+input {
+  height: 25px;
+  border-radius: 5px;
+  border: 1px lightgrey solid;
+  padding-left: 1em;
+  outline: none;
+}
+
+label {
+  font-size: 14px;
+}
+
 .title {
   text-align: center;
 }
@@ -22,8 +34,46 @@ td, th {
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
+  width: 200px;
 }
 
 .form-container {
   margin-top: 2em;
+  display: flex;
+  align-items: flex-end;
+}
+
+.buttonsContainer {
+  button:first-child {
+    margin-right: 2em;
+  }
+}
+
+.customButton {
+  background-color: #599bb3;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #ffffff;
+  //font-size: 20px;
+  font-weight: bold;
+  width: 50px;
+  height: 30px;
+  text-decoration: none;
+  text-shadow: 0px 1px 0px #3d768a;
+  border: none;
+  outline: none;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  margin-right: 2em;
+}
+
+.bg-red {
+  background-color: #e4685d !important;
+}
+
+.bg-green {
+  background-color: #77b55a !important;
 }
