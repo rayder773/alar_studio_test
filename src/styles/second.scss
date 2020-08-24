@@ -41,6 +41,7 @@ td, th {
   margin-top: 2em;
   display: flex;
   align-items: flex-end;
+  position: relative;
 }
 
 .buttonsContainer {
@@ -62,6 +63,10 @@ td, th {
   text-shadow: 0px 1px 0px #3d768a;
   border: none;
   outline: none;
+
+  &:disabled {
+    background: lightgrey;
+  }
 }
 
 .input-container {
@@ -76,4 +81,11 @@ td, th {
 
 .bg-green {
   background-color: #77b55a !important;
+}
+
+#error {
+  color: red;
+  position: absolute;
+  bottom: -33px;
+  display: none;
 }

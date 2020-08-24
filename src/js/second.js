@@ -5,6 +5,7 @@ const $tbody = document.getElementById('tbody');
 const $addBtn = document.getElementById('add-btn');
 const $nameInput = document.getElementById('name');
 const $phoneInput = document.getElementById('phone');
+const $errorMessage = document.getElementById('error');
 
 const getUsers = () => {
   return users;
@@ -41,8 +42,10 @@ const handleChange = (e) => {
 
   const isValidPhone = validatePhone();
   const isValidName = validateName();
+  const isInvalidOneOfField = !isValidPhone || !isValidName;
 
-  $addBtn.disabled = !isValidPhone || !isValidName;
+  $addBtn.disabled = isInvalidOneOfField;
+  $errorMessage.style.display = isInvalidOneOfField ? 'initial' : 'none'
 }
 
 const handleAddUser = (e) => {
@@ -122,6 +125,13 @@ const handleEdit = (e) => {
 
 const handleDelete = (e) => {
   const tr = e.path.find(el => el.localName === 'tr') || {};
+  const text = tr.firstChild.textContent;
+
+  const user = state.users.find(u => text.startsWith(u.name));
+  const userIndex = state.users.findIndex(u => text.startsWith(u.name));
+
+  state.users.splice(userIndex, 1);
+
   $tbody.removeChild(tr)
 }
 
